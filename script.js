@@ -1,31 +1,29 @@
-// let temporaryUrl = window.location.toString();
-// console.log(temporaryUrl);
-// let img = document.createElement('img');
-// document.body.append(img);
-
-
-// let res = fetch('https://api.github.com/users/6thSence');
-//   // .then(res => res.json()
-//   )
-//   // .then(json =>{document.body.innerHTML = "<img url=" + json.avatar_url+">"  + "<div>" + json.name + "</div>"+ "<div>"+ json.bio + "</div>"+ "<a href=" + json.url + ">" + json.url + "</a>" })
-//   // .catch(err => console.log(err));
-
-let url = window.location.toString();	
-let getName = () => {
-	let urlSplit = url.split('=');
-	let name = urlSplit[1];
-	if (name == undefined) {
-		name = 'LenaMakeeva';
-	}
+let url = window.location.toString();
+const getName = (url) => {
+  let url2 = url.split('=');
+  let name = url2[1];
+  if (name == undefined) {
+    name = 'LenaMakeeva';
+  }
+return name;
 }
-let img = document.createElement('img');
-document.body.append(img);
-fetch(`https://api.github.com/users/${getName()}`)
-	.then(res => res.json)
-	.then(json => { 
-		console.log(json);
-		console.log(json.avatar_url);
-		img.src = json.avatar_url;
-	}
-	)
-	.catch(err => console.log(err));
+
+fetch(`https://api.github.com/users/${getName(url)}`)
+  .then(res => res.json())
+  .then(json => { 
+    console.log(json.avatar_url);
+    console.log(json.name);
+    console.log(json.bio);
+    console.log(json.html_url);
+    let link = document.createElement('a');
+    link.href = json.html_url;
+    link.text = json.name;
+    document.body.append(link);
+    let info = document.createElement('p');
+    info.innerHTML = json.bio;
+    document.body.append(info);
+    let img = document.createElement('img');
+    img.src = json.avatar_url;
+    document.body.append(img);
+})
+  .catch(err => alert('Информация о пользователе недоступна'));
