@@ -1,31 +1,53 @@
-// let temporaryUrl = window.location.toString();
-// console.log(temporaryUrl);
-// let img = document.createElement('img');
-// document.body.append(img);
+let url = window.location.toString();
+let preloader = document.getElementById('loader');
+setTimeout(function() {
+  preloader.classList.add('hide');
+}, 5000);
 
 
-// let res = fetch('https://api.github.com/users/6thSence');
-//   // .then(res => res.json()
-//   )
-//   // .then(json =>{document.body.innerHTML = "<img url=" + json.avatar_url+">"  + "<div>" + json.name + "</div>"+ "<div>"+ json.bio + "</div>"+ "<a href=" + json.url + ">" + json.url + "</a>" })
-//   // .catch(err => console.log(err));
-
-let url = window.location.toString();	
-let getName = () => {
-	let urlSplit = url.split('=');
-	let name = urlSplit[1];
-	if (name == undefined) {
-		name = 'LenaMakeeva';
-	}
+const getInfo = (url) => {
+  // document.getElementsByClassName('loader').classList.add('hide');
+  let url2 = url.split('=');
+  let name = url2[1];
+  if (name == undefined) {
+    name = 'LenaMakeeva';
+  }
+  let url1 = 'https://api.github.com/users/'+ name;
+  return url1;
 }
-let img = document.createElement('img');
-document.body.append(img);
-fetch(`https://api.github.com/users/${getName()}`)
-	.then(res => res.json)
-	.then(json => { 
-		console.log(json);
-		console.log(json.avatar_url);
-		img.src = json.avatar_url;
-	}
-	)
-	.catch(err => console.log(err));
+
+let getURL = getInfo(url);
+
+const getName = new Promise((resolve,reject) => {
+  setTimeout(() => getURL ? resolve(getURL) : reject('имя неопределено'), 2000);
+});
+
+let now = new Date();
+const getDate = new Promise ((resolve, reject) => {
+  setTimeout(() => now ? resolve(now) : reject('дата неопределена'), 5000);
+});
+
+Promise.all([getDate, getName])
+  .then(([now,getURL]) => fetch(getURL))
+  .then(res => res.json())
+  .then(json => {
+    console.log(json.avatar_url);
+    console.log(json.name);
+    console.log(json.bio);
+    console.log(json.html_url);
+    let link = document.createElement('a');
+    link.href = json.html_url;
+    link.text = json.name;
+    document.body.append(link);
+    let info = document.createElement('p');
+    info.innerHTML = json.bio;
+    document.body.append(info);
+    let img = document.createElement('img');
+    img.src = json.avatar_url;
+    document.body.append(img);
+    let date = document.createElement('p');
+    date.innerHTML = now;
+    document.body.append(date);
+    console.log(now);
+  })
+  .catch(err => alert('Информация о пользователе недоступна'));
